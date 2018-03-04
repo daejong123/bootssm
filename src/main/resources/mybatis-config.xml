@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="proxyFactory" value="CGLIB"/>
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
+    <typeAliases>
+        <package name="com.dottie.helloworld.entity"/>
+    </typeAliases>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <!-- 设置数据库类型 Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL六种数据库-->
+            <property name="dialect" value="mysql"/>
+            <!--会将rowBounds的第一个参数offset当成pageNum的页码使用-->
+            <property name="offsetAsPageNum" value="true"/>
+            <!--使用rowBoun ds分页会进行count查询-->
+            <property name="rowBoundsWithCount" value="true"/>
+            <!--如果pageSize = 0 或者 rowBounds的limit为零, 就会查出所有结果
+            ,相当于没有执行分页查询,但是返回结果任是 Page类型.-->
+            <property name="pageSizeZero" value="true"/>
+        </plugin>
+    </plugins>
+</configuration>

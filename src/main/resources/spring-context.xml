@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/tx
+                        http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--扫描业务层组件-->
+    <context:component-scan base-package="com.dottie.helloworld.service"/>
+    <mvc:annotation-driven/>
+
+    <!--配置数据源 使用c3p0-->
+    <bean class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          id="dataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <!--这里
+        useUnicode=true&amp;characterEncoding=UTF-8
+        指定连接数据库用的编码, 否则就会出现中文查不到数据的现象,
+        注意, 防止乱码的出现,
+        要同时设定 数据库的编码, 和项目的编码, 和项目连接数据库用的编码, 必须统一,否则会出现乱码的现象-->
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/ganjiDB?useUnicode=true&amp;characterEncoding=UTF-8"/>
+        <property name="user" value="root"/>
+        <property name="password" value="123456"/>
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="5"/>
+        <property name="initialPoolSize" value="2"/>
+        <property name="acquireIncrement" value="2"/>
+    </bean>
+
+    <!--配置一个声明式事务管理器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          id="dataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--使用注解来控制事务.-->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"  proxy-target-class="true" />
+
+    <!--配置sqlsessionFactory 指定数据源和mybatis配置文件的路劲-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:mapper/*.xml</value>
+            </list>
+        </property>
+    </bean>
+    <!--扫描dao层-->
+    <!--mybatis这里配置的bean的作用很关键, 扫描生成所有的dao对象, 放到spring容器中.-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.dottie.helloworld.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>
